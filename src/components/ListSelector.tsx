@@ -10,10 +10,14 @@ export interface ListSelectorProps {
   onDelete: (list: RawTodoList) => void;
 }
 
+type EditingState = [enabled: boolean, addingNew: boolean];
+
 export const ListSelector: FC<ListSelectorProps> = (props) => {
-  const [editing, setEditing] = useState(false);
-  const [editingNew, setEditingNew] = useState(false);
   const [value, setValue] = useState("");
+  const [[editing, addingNew], setEditing] = useState<EditingState>([
+    false,
+    false,
+  ]);
 
   function select(id: number): void {
     const list = props.lists.find((list) => list.id === id);
@@ -27,7 +31,7 @@ export const ListSelector: FC<ListSelectorProps> = (props) => {
     e.preventDefault();
 
     if (value.length > 0) {
-      if (editingNew) {
+      if (addingNew) {
         props.onNewList(value);
       } else {
         props.onEdit(props.current, (newList) => {
@@ -36,7 +40,7 @@ export const ListSelector: FC<ListSelectorProps> = (props) => {
       }
 
       setValue("");
-      setEditing(false);
+      setEditing([false, false]);
     }
   }
 
@@ -51,7 +55,7 @@ export const ListSelector: FC<ListSelectorProps> = (props) => {
             autoFocus
             value={value}
             onInput={(e) => setValue(e.currentTarget.value)}
-            onBlur={() => setEditing(false)}
+            onBlur={() => setEditing([false, false])}
           />
         </form>
       ) : (
@@ -71,8 +75,7 @@ export const ListSelector: FC<ListSelectorProps> = (props) => {
           <button
             className="btn btn-outline-primary"
             onClick={() => {
-              setEditing(true);
-              setEditingNew(false);
+              setEditing([true, false]);
               setValue(props.current.name);
             }}
           >
@@ -94,8 +97,7 @@ export const ListSelector: FC<ListSelectorProps> = (props) => {
         className="btn btn-primary hstack gap-2 flex-shrink-0"
         type="button"
         onClick={() => {
-          setEditing(true);
-          setEditingNew(true);
+          setEditing([true, true]);
           setValue("");
         }}
       >
