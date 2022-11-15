@@ -23,7 +23,7 @@ import {
   storeTodoLastId,
   storeTodoLists,
 } from "../store";
-import { getFirstItem } from "../utils/array";
+import { editArrayItem, getFirstItem } from "../utils/array";
 import { ListSelector } from "./ListSelector";
 import { TodoAdder } from "./TodoAdder";
 import { TodoList } from "./TodoList";
@@ -69,16 +69,7 @@ export const App: FC = () => {
     list: RawTodoList,
     edit: (newList: RawTodoList) => void
   ): void {
-    const index = lists.indexOf(list);
-
-    if (index < 0) return;
-
-    const newLists = [...lists];
-    const newList = { ...list };
-
-    edit(newList);
-
-    newLists[index] = newList;
+    const [newLists, newList] = editArrayItem(lists, list, edit);
 
     setLists(newLists);
     setCurrentList(newList);
@@ -105,16 +96,8 @@ export const App: FC = () => {
     edit: (newItem: RawTodoItem) => void
   ): void {
     editList(currentList, (newList) => {
-      const index = newList.items.indexOf(item);
-
-      if (index < 0) return;
-
-      newList.items = [...newList.items];
-      const newItem = { ...item };
-
-      edit(newItem);
-
-      newList.items[index] = newItem;
+      const [newItems] = editArrayItem(newList.items, item, edit);
+      newList.items = newItems;
     });
   }
 

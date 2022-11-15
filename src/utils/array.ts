@@ -12,3 +12,22 @@ export function getFirstItem<T>(arr: T[]): T {
 
   return result;
 }
+
+export function editArrayItem<T>(
+  array: T[],
+  item: T,
+  edit: (newItem: T) => void
+): [newArray: T[], newItem: T] {
+  const index = array.indexOf(item);
+
+  if (index < 0) return [array, item];
+
+  const newArray = [...array];
+  const newItem = { ...item };
+
+  edit(newItem);
+
+  newArray[index] = newItem;
+
+  return [newArray, newItem];
+}
