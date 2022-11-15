@@ -174,7 +174,7 @@ export const App: FC = () => {
       >
         <TodoList
           items={currentList.items}
-          onEdit={editItem}
+          edit={editItem}
           onDelete={deleteItem}
         />
       </DndContext>

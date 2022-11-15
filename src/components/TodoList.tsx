@@ -8,27 +8,11 @@ import { TodoItem } from "./TodoItem";
 
 export interface TodoListProps {
   items: RawTodoItem[];
-  onEdit: (item: RawTodoItem, edit: (newItem: RawTodoItem) => void) => void;
+  edit: (item: RawTodoItem, edit: (newItem: RawTodoItem) => void) => void;
   onDelete: (item: RawTodoItem) => void;
 }
 
 export const TodoList: FC<TodoListProps> = (props) => {
-  function editName(item: RawTodoItem, newName: string): void {
-    props.onEdit(item, (newItem) => {
-      newItem.name = newName;
-    });
-  }
-
-  function toggleDone(item: RawTodoItem, newValue: boolean): void {
-    props.onEdit(item, (newItem) => {
-      if (newValue) {
-        newItem.done = true;
-      } else {
-        delete newItem.done;
-      }
-    });
-  }
-
   return (
     <div className="vstack gap-2 flex-grow-1">
       <SortableContext
@@ -39,8 +23,7 @@ export const TodoList: FC<TodoListProps> = (props) => {
           <TodoItem
             key={item.id}
             info={item}
-            onEditName={(newName) => editName(item, newName)}
-            onToggleDone={(newValue) => toggleDone(item, newValue)}
+            edit={props.edit}
             onDelete={() => props.onDelete(item)}
           />
         ))}

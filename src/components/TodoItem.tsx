@@ -1,13 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import classnames from "classnames";
-import { createElement, FC, useState } from "react";
+import { createElement, FC, FormEvent, Fragment, useState } from "react";
 import { RawTodoItem } from "../store";
 
 export interface TodoItemProps {
   info: RawTodoItem;
-  onEditName: (name: string) => void;
-  onToggleDone: (value: boolean) => void;
+  edit: (item: RawTodoItem, edit: (newItem: RawTodoItem) => void) => void;
   onDelete: () => void;
 }
 
@@ -24,6 +23,28 @@ export const TodoItem: FC<TodoItemProps> = (props) => {
     transition,
   };
 
+  function handleSubmit(e: FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+
+    setEditing(false);
+  }
+
+  function setName(name: string): void {
+    props.edit(props.info, (newInfo) => {
+      newInfo.name = name;
+    });
+  }
+
+  function setDone(done: boolean): void {
+    props.edit(props.info, (newInfo) => {
+      if (done) {
+        newInfo.done = true;
+      } else {
+        delete newInfo.done;
+      }
+    });
+  }
+
   return (
     <div
       className={classnames("card hstack gap-2 px-3 py-2", {
@@ -35,36 +56,40 @@ export const TodoItem: FC<TodoItemProps> = (props) => {
         type="checkbox"
         className="form-check-input m-0 flex-shrink-0"
         checked={props.info.done === true}
-        onChange={(e) => props.onToggleDone(e.currentTarget.checked)}
+        onChange={(e) => setDone(e.currentTarget.checked)}
       />
 
       {editing ? (
-        <input
-          type="text"
-          className="form-control form-control-sm"
-          value={props.info.name}
-          autoFocus
-          onInput={(e) => props.onEditName(e.currentTarget.value)}
-          onKeyDown={(e) => (e.key === "Enter" ? setEditing(false) : void 0)}
-        />
+        <form className="flex-grow-1" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="form-control form-control-sm"
+            value={props.info.name}
+            autoFocus
+            onInput={(e) => setName(e.currentTarget.value)}
+            onBlur={() => setEditing(false)}
+          />
+        </form>
       ) : (
-        <div
-          className={classnames("card-text me-auto", {
-            "text-decoration-line-through": props.info.done,
-            "text-muted": props.info.done,
-          })}
-        >
-          {props.info.name}
-        </div>
-      )}
+        <>
+          <div
+            className={classnames("card-text me-auto", {
+              "text-decoration-line-through": props.info.done,
+              "text-muted": props.info.done,
+            })}
+          >
+            {props.info.name}
+          </div>
 
-      <button
-        className="btn btn-outline-primary btn-sm"
-        type="button"
-        onClick={() => setEditing(!editing)}
-      >
-        <i className="fas fa-edit"></i>
-      </button>
+          <button
+            className="btn btn-outline-primary btn-sm"
+            type="button"
+            onClick={() => setEditing(true)}
+          >
+            <i className="fas fa-edit"></i>
+          </button>
+        </>
+      )}
 
       <button
         className="btn btn-outline-danger btn-sm"
